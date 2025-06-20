@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 420px;
+      max-height: 650px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      overflow-y: auto;
+    }
+
+    .container {
+      background: white;
+      margin: 10px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #6c7ae0 0%, #7b68ee 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h3 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .content {
+      padding: 25px;
+    }
+
+    .btn-group {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    button:hover::before {
+      left: 100%;
+    }
+
+    #selectFolderBtn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    #selectFolderBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    #loadImagesBtn {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+    }
+
+    #loadImagesBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+    }
+
+    #downloadBtn {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+    }
+
+    #downloadBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 172, 254, 0.6);
+    }
+
+    #convertBtn {
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      color: #333;
+      box-shadow: 0 4px 15px rgba(168, 237, 234, 0.4);
+    }
+
+    #convertBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(168, 237, 234, 0.6);
+    }
+
+    .form-group {
+      margin: 20px 0;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e1e8ed;
+      border-radius: 10px;
+      font-size: 14px;
+      background: white;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .quality-group {
+      display: none;
+      background: #f8f9ff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+
+    .quality-group input[type="range"] {
+      width: 100%;
+      margin: 10px 0;
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: #ddd;
+      outline: none;
+    }
+
+    .quality-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #667eea;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .quality-value {
+      text-align: center;
+      font-weight: 600;
+      color: #667eea;
+      font-size: 16px;
+    }
+
+    #status {
+      margin: 15px 0;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      text-align: center;
+      min-height: 20px;
+    }
+
+    .status-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .status-info {
+      background: #cce7ff;
+      color: #004085;
+      border: 1px solid #b8daff;
+    }
+
+    #imageContainer {
+      max-height: 350px;
+      overflow-y: auto;
+      border: 2px solid #e1e8ed;
+      border-radius: 12px;
+      margin: 15px 0;
+      background: #fafbfc;
+    }
+
+    .select-all {
+      padding: 15px;
+      background: white;
+      border-bottom: 1px solid #e1e8ed;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .select-all label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .select-all input[type="checkbox"] {
+      margin-right: 8px;
+      transform: scale(1.2);
+    }
+
+    #selectedCount {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    #imageList {
+      padding: 10px;
+    }
+
+    .image-item {
+      display: flex;
+      align-items: center;
+      margin: 8px 0;
+      padding: 12px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .image-item:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .image-item img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      margin-right: 12px;
+      border-radius: 8px;
+      border: 2px solid #e1e8ed;
+    }
+
+    .image-item input[type="checkbox"] {
+      margin-right: 12px;
+      transform: scale(1.2);
+    }
+
+    .image-info {
+      flex: 1;
+      font-size: 12px;
+      color: #666;
+      overflow: hidden;
+    }
+
+    .image-info strong {
+      color: #333;
+      font-size: 13px;
+    }
+
+    .download-options {
+      background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+      padding: 20px;
+      border-radius: 12px;
+      margin: 15px 0;
+      border: 1px solid #e1e8ed;
+      display: none;
+    }
+
+    .download-options h4 {
+      margin-bottom: 15px;
+      color: #555;
+      font-size: 16px;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    /* Loading animation */
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    
+    <div class="content">
+      <div class="btn-group">
+        <button id="selectFolderBtn">📁 Chọn thư mục lưu</button>
+        <button id="loadImagesBtn">🔄 Tải danh sách ảnh</button>
+      </div>
+      
+    
+      
+      <div class="download-options" id="downloadOptions">
+        <h4>⚙️ Tùy chọn tải xuống</h4>
+        <div class="form-group">
+          <label for="formatSelect">Định dạng ảnh:</label>
+          <select id="formatSelect">
+            <option value="original">Giữ nguyên định dạng gốc</option>
+            <option value="jpg">JPG</option>
+            <option value="png">PNG</option>
+            <option value="webp">WebP</option>
+          </select>
+        </div>
+        
+        <div class="quality-group" id="qualityGroup">
+          <label for="qualitySlider">Chất lượng ảnh:</label>
+          <input type="range" id="qualitySlider" min="10" max="100" value="80">
+          <div class="quality-value" id="qualityValue">80%</div>
+        </div>
+      </div>
+      
+      <div class="btn-group">
+        <button id="downloadBtn" style="display: none;">⬇️ Tải xuống ảnh đã chọn</button>
+        <button id="convertBtn" style="display: none;">🔄 Chuyển đổi & Tải xuống</button>
+      </div>
+      
+      <div id="status"></div>
+        <div id="imageContainer" style="display: none;">
+        <div class="select-all">
+          <label>
+            <input type="checkbox" id="selectAllCheckbox"> Chọn tất cả
+          </label>
+          <span id="selectedCount">0 ảnh được chọn</span>
+        </div>
+        <div id="imageList"></div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
